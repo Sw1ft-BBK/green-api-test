@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREEN-API Test</title>
+    <script>
+        async function callAPI(endpoint, method = 'GET', body = null) {
+            const idInstance = document.getElementById('idInstance').value;
+            const apiToken = document.getElementById('apiTokenInstance').value;
+            const url = `https://api.green-api.com/waInstance${idInstance}/${endpoint}/${apiToken}`;
+            
+            const options = { method };
+            if (body) {
+                options.headers = { 'Content-Type': 'application/json' };
+                options.body = JSON.stringify(body);
+            }
+            
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('output').textContent = 'Ошибка: ' + error.message;
+            }
+        }
+    </script>
+</head>
+<body>
+    <label>ID Instance: <input type="text" id="idInstance"></label>
+    <label>API Token: <input type="text" id="apiTokenInstance"></label>
+    
+    <button onclick="callAPI('getSettings')">getSettings</button>
+    <button onclick="callAPI('getStateInstance')">getStateInstance</button>
+    
+    <label>Телефон: <input type="text" id="phoneNumber"></label>
+    <label>Сообщение: <input type="text" id="message"></label>
+    <button onclick="sendMessage()">sendMessage</button>
+    
+    <label>Файл URL: <input type="text" id="fileUrl"></label>
+    <button onclick="sendFileByUrl()">sendFileByUrl</button>
+    
+    <pre id="output" style="border: 1px solid #000; padding: 10px; height: 200px; overflow: auto;"></pre>
+    
+    <script>
+        function sendMessage() {
+            const phone = document.getElementById('phoneNumber').value;
+            const message = document.getElementById('message').value;
+            callAPI('sendMessage', 'POST', { chatId: phone + '@c.us', message });
+        }
+        
+        function sendFileByUrl() {
+            const phone = document.getElementById('phoneNumber').value;
+            const fileUrl = document.getElementById('fileUrl').value;
+            callAPI('sendFileByUrl', 'POST', { chatId: phone + '@c.us', urlFile: fileUrl });
+        }
+    </script>
+</body>
+</html>
